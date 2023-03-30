@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "AlgoTime",
+    "version": "1.0",
+    "description": "A chrome extension get the time and space complexity of your leetcode solutions",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://leetcode.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}
