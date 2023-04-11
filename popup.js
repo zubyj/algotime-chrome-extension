@@ -1,18 +1,35 @@
-
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-    if (request.type === 'viewLineText') {
-        const codeText = request.data.join('\n');
-        const timeComplexity = await fetchTimeComplexity(codeText);
-        document.getElementById('time-complexity').textContent = `${timeComplexity}`;
+document.getElementById('analyze-code').addEventListener('click', async () => {
+    const codeText = await getCodeFromActiveTab();
+    if (codeText) {
+        const result = await fetchTimeComplexity(codeText);
+        if (result.success) {
+            document.getElementById('time-complexity').textContent = `${result.timeComplexity}`;
+        } else {
+            document.getElementById('time-complexity').textContent = 'Error: Unable to fetch time complexity';
+        }
+    } else {
+        document.getElementById('time-complexity').textContent = 'Error: Unable to retrieve code';
     }
 });
 
-chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        files: ['content.js']
-    });
-});
+async function getCodeFromActiveTab() {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        return await new Promise((resolve) => {
+            chrome.tabs.sendMessage(tab.id, { type: 'getCode' }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError);
+                    resolve(null);
+                } else {
+                    resolve(response.data.join('\n'));
+                }
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
 
 function fetchTimeComplexity(prompt) {
     return new Promise((resolve, reject) => {

@@ -8,15 +8,16 @@
     },
     "permissions": [
         "activeTab",
-        "scripting"
+        "scripting",
+        "storage"
     ],
     "host_permissions": [
-        "https://api.openai.com/*"
+        "https://*/api.openai.com/*"
     ],
     "content_scripts": [
         {
             "matches": [
-                "https://leetcode.com/*"
+                "https://leetcode.com/problems/*"
             ],
             "js": [
                 "content.js"
